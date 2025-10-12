@@ -92,7 +92,9 @@ export default function HomeLoansPage() {
                       ))}
                     </ul>
                   </div>
-                  <Button className="w-full">Apply Now</Button>
+                  <Button className="w-full" asChild>
+                    <a href={`/loans/home-loan/apply?type=${encodeURIComponent(loan.title)}`}>Apply Now</a>
+                  </Button>
                 </CardContent>
               </Card>
             ))}
@@ -147,7 +149,9 @@ export default function HomeLoansPage() {
             Our home loan experts are here to guide you through every step of the process
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg">Apply Online</Button>
+            <Button size="lg" asChild>
+              <a href="/loans/home-loan/apply">Apply Online</a>
+            </Button>
             <Button size="lg" variant="outline">
               Talk to Expert
             </Button>

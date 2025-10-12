@@ -84,8 +84,11 @@ export function InteractiveTools() {
                 <p className="text-3xl font-bold text-primary">₹{calculateEMI().toLocaleString("en-IN")}</p>
               </div>
 
-              <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 font-medium min-h-[48px]">
-                Apply for a Personal Loan
+              <Button
+                className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 font-medium min-h-[48px]"
+                asChild
+              >
+                <a href="/loans/personal-loan/apply">Apply for a Personal Loan</a>
               </Button>
             </CardContent>
           </Card>

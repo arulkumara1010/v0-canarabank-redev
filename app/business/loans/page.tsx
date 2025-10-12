@@ -92,7 +92,13 @@ export default function BusinessLoansPage() {
                       ))}
                     </ul>
                   </div>
-                  <Button className="w-full">Apply Now</Button>
+                  <Button className="w-full" asChild>
+                    <a
+                      href={`/loans/${index === 0 ? "working-capital" : index === 1 ? "term-loan" : "msme-loan"}/apply`}
+                    >
+                      Apply Now
+                    </a>
+                  </Button>
                 </CardContent>
               </Card>
             ))}
@@ -124,7 +130,9 @@ export default function BusinessLoansPage() {
             Our business loan experts are ready to help you achieve your growth objectives
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg">Apply Online</Button>
+            <Button size="lg" asChild>
+              <a href="/loans?category=business">Apply Online</a>
+            </Button>
             <Button size="lg" variant="outline">
               Schedule Meeting
             </Button>

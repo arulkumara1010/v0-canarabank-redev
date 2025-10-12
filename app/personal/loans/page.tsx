@@ -56,15 +56,17 @@ export default function LoansPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-secondary text-secondary-foreground hover:bg-secondary/90">
-                Apply for Loan
+                <a href="/loans">Apply for Loan</a>
               </Button>
               <Button
                 size="lg"
                 variant="outline"
                 className="border-white text-white hover:bg-white hover:text-primary bg-transparent"
               >
-                <Calculator className="mr-2 h-4 w-4" />
-                EMI Calculator
+                <a href="/loans/home-loan">
+                  <Calculator className="mr-2 h-4 w-4" />
+                  EMI Calculator
+                </a>
               </Button>
             </div>
           </div>
@@ -110,10 +112,20 @@ export default function LoansPage() {
                       </ul>
                     </div>
                     <div className="flex space-x-2">
-                      <Button className="flex-1">Apply Now</Button>
-                      <Button variant="outline" className="flex-1 bg-transparent">
-                        Learn More
-                      </Button>
+                      <a
+                        href={`/loans/${loan.name === "Home Loans" ? "home-loan" : loan.name === "Car Loans" ? "car-loan" : loan.name === "Education Loans" ? "education-loan" : "personal-loan"}/apply`}
+                        className="flex-1"
+                      >
+                        <Button className="w-full">Apply Now</Button>
+                      </a>
+                      <a
+                        href={`/loans/${loan.name === "Home Loans" ? "home-loan" : loan.name === "Car Loans" ? "car-loan" : loan.name === "Education Loans" ? "education-loan" : "personal-loan"}`}
+                        className="flex-1"
+                      >
+                        <Button variant="outline" className="w-full bg-transparent">
+                          Learn More
+                        </Button>
+                      </a>
                     </div>
                   </CardContent>
                 </Card>

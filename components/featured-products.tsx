@@ -23,7 +23,7 @@ const featuredProducts = [
     title: "Instant Personal Loan",
     description: "Get approved in minutes, not days.",
     image: "/fast-loan-approval-mobile-app.jpg",
-    href: "/personal/loans",
+    href: "/loans/personal-loan", // updated to new details route
   },
 ]
 

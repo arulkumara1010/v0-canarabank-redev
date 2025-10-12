@@ -6,17 +6,17 @@ const quickAccessItems = [
   {
     icon: Home,
     title: "Home Loans",
-    href: "/personal/home-loans",
+    href: "/loans/home-loan",
   },
   {
     icon: Car,
     title: "Car Loans",
-    href: "/personal/loans",
+    href: "/loans/car-loan",
   },
   {
     icon: GraduationCap,
     title: "Education Loans",
-    href: "/personal/loans",
+    href: "/loans/education-loan",
   },
   {
     icon: CreditCard,
