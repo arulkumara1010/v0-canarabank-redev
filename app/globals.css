@@ -22,7 +22,7 @@
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(1 0 0);
   --border: oklch(0.92 0 0);
-  --input: oklch(1 0 0);
+  --input: var(--border); /* make inputs use the border color so they are visible without hover */
   --ring: oklch(0.35 0.15 240);
   --chart-1: oklch(0.35 0.15 240);
   --chart-2: oklch(0.85 0.15 85);
@@ -58,7 +58,7 @@
   --destructive: oklch(0.6 0.25 25);
   --destructive-foreground: oklch(1 0 0);
   --border: oklch(0.25 0 0);
-  --input: oklch(0.25 0 0);
+  --input: var(--border); /* make inputs use the border token in dark mode as well */
   --ring: oklch(0.5 0.15 240);
   --chart-1: oklch(0.5 0.15 240);
   --chart-2: oklch(0.75 0.15 85);
