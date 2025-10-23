@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
@@ -69,6 +69,9 @@ export default function DocumentsPage() {
 
   const [uploadedFiles, setUploadedFiles] = useState<Record<string, UploadedFile>>({})
   const [formData, setFormData] = useState<any>(null)
+
+  const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({})
+  const reuploadRefs = useRef<Record<string, HTMLInputElement | null>>({})
 
   useEffect(() => {
     // Load form data from previous step
@@ -221,14 +224,15 @@ export default function DocumentsPage() {
                               if (file) handleFileUpload(document.id, file)
                             }}
                             className="hidden"
-                            id={`upload-${document.id}`}
+                            ref={(el) => {
+                              if (el) fileInputRefs.current[`upload-${document.id}`] = el
+                            }}
                           />
                           <div className="flex gap-2 justify-center">
                             <Button
                               variant="outline"
                               onClick={() => {
-                                const input = document.getElementById(`upload-${document.id}`) as HTMLInputElement
-                                input?.click()
+                                fileInputRefs.current[`upload-${document.id}`]?.click()
                               }}
                             >
                               <ImageIcon className="h-4 w-4 mr-2" />
@@ -237,8 +241,7 @@ export default function DocumentsPage() {
                             <Button
                               variant="outline"
                               onClick={() => {
-                                const input = document.getElementById(`upload-${document.id}`) as HTMLInputElement
-                                input?.click()
+                                fileInputRefs.current[`upload-${document.id}`]?.click()
                               }}
                             >
                               <Camera className="h-4 w-4 mr-2" />
@@ -288,14 +291,15 @@ export default function DocumentsPage() {
                             if (file) handleFileUpload(document.id, file)
                           }}
                           className="hidden"
-                          id={`reupload-${document.id}`}
+                          ref={(el) => {
+                            if (el) reuploadRefs.current[`reupload-${document.id}`] = el
+                          }}
                         />
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => {
-                            const input = document.getElementById(`reupload-${document.id}`) as HTMLInputElement
-                            input?.click()
+                            reuploadRefs.current[`reupload-${document.id}`]?.click()
                           }}
                         >
                           Upload Different File
