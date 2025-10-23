@@ -13,6 +13,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuth } from "@/components/auth-provider"
 import { LOANS } from "@/lib/loans"
+import { addLoanApplication } from "@/lib/transactions"
+import { toast } from "sonner"
 
 export default function ApplyLoanPage({ params }: { params: { slug: string } }) {
   const loan = LOANS.find((l) => l.slug === params.slug)
@@ -43,6 +45,7 @@ export default function ApplyLoanPage({ params }: { params: { slug: string } }) 
   })
   const [submitted, setSubmitted] = useState(false)
   const [applicationId, setApplicationId] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   if (!loan) {
     if (typeof window !== "undefined") router.replace("/loans")
@@ -53,12 +56,41 @@ export default function ApplyLoanPage({ params }: { params: { slug: string } }) 
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Dummy submit: create fake application ID and show success
-    const id = `CAN-${loan.slug}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`
-    setApplicationId(id)
-    setSubmitted(true)
+    
+    if (!user) {
+      toast.error("Please login to apply for a loan")
+      return
+    }
+
+    if (!form.amount || !form.tenure) {
+      toast.error("Please fill in required fields")
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      // Add loan application to user data
+      const loanApplication = await addLoanApplication(user.id, {
+        loanType: loan.title,
+        amount: parseFloat(form.amount),
+        tenure: form.tenure,
+        purpose: form.purpose,
+        applicationNumber: `CAN-${loan.slug}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`
+      })
+
+      setApplicationId(loanApplication.applicationNumber)
+      setSubmitted(true)
+      toast.success("Loan application submitted successfully!")
+      
+    } catch (error) {
+      toast.error("Failed to submit loan application. Please try again.")
+      console.error("Loan application error:", error)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -267,8 +299,8 @@ export default function ApplyLoanPage({ params }: { params: { slug: string } }) 
                   </div>
 
                   <div className="flex gap-2">
-                    <Button type="submit" className="flex-1">
-                      Submit Application
+                    <Button type="submit" className="flex-1" disabled={isSubmitting}>
+                      {isSubmitting ? "Submitting..." : "Submit Application"}
                     </Button>
                     <Link href={`/loans/${loan.slug}`}>
                       <Button type="button" variant="outline" className="flex-1 bg-transparent">

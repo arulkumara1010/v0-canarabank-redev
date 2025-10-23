@@ -6,7 +6,15 @@ import { useAuth } from "@/components/auth-provider"
 import Link from "next/link"
 
 export function HeroSection() {
-  const { user } = useAuth()
+  // Safely use useAuth with error handling
+  let user = null
+  try {
+    const authContext = useAuth()
+    user = authContext?.user || null
+  } catch (error) {
+    // If useAuth fails (e.g., not wrapped in AuthProvider), default to null
+    user = null
+  }
 
   return (
     <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden">
@@ -31,35 +39,48 @@ export function HeroSection() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
             {user ? (
-              <Link href="/dashboard">
-                <Button
-                  size="lg"
-                  className="bg-secondary text-secondary-foreground hover:bg-secondary/90 font-medium min-h-[48px] px-8"
-                >
-                  Go to Dashboard
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
+              <>
+                <Link href="/dashboard">
+                  <Button
+                    size="lg"
+                    className="bg-secondary text-secondary-foreground hover:bg-secondary/90 font-medium min-h-[48px] px-8"
+                  >
+                    Go to Dashboard
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link href="/dashboard/transfer">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="border-white text-white hover:bg-white hover:text-primary min-h-[48px] px-8 bg-transparent"
+                  >
+                    Transfer Money
+                  </Button>
+                </Link>
+              </>
             ) : (
-              <Link href="/open-account">
-                <Button
-                  size="lg"
-                  className="bg-secondary text-secondary-foreground hover:bg-secondary/90 font-medium min-h-[48px] px-8"
-                >
-                  Open Account Now
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
+              <>
+                <Link href="/open-account">
+                  <Button
+                    size="lg"
+                    className="bg-secondary text-secondary-foreground hover:bg-secondary/90 font-medium min-h-[48px] px-8"
+                  >
+                    Open Account Now
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link href="/login">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="border-white text-white hover:bg-white hover:text-primary min-h-[48px] px-8 bg-transparent"
+                  >
+                    Login to Your Account
+                  </Button>
+                </Link>
+              </>
             )}
-            <Link href={user ? "/dashboard/transfer" : "/login"}>
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-white text-white hover:bg-white hover:text-primary min-h-[48px] px-8 bg-transparent"
-              >
-                {user ? "Transfer Money" : "Explore Our Services"}
-              </Button>
-            </Link>
           </div>
         </div>
       </div>

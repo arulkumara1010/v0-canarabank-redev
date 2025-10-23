@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ArrowLeft, ArrowRight, Upload, FileText, CheckCircle, AlertCircle, Camera, ImageIcon } from "lucide-react"
 import Link from "next/link"
+import { toast } from "sonner"
 import { useToast } from "@/hooks/use-toast"
 
 const accountTypeNames = {
@@ -152,8 +153,19 @@ export default function DocumentsPage() {
       )
 
       localStorage.setItem("accountDocuments", JSON.stringify(documentData))
+      toast({
+        title: "Documents uploaded successfully!",
+        description: "Your documents have been uploaded.",
+      })
       router.push(`/open-account/terms?type=${accountType}`)
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Missing documents",
+        description: "Please upload all required documents.",
+      })
     }
+
   }
 
   return (

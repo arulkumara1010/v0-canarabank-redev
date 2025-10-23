@@ -15,6 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Progress } from "@/components/ui/progress"
 import { ArrowLeft, ArrowRight, User, MapPin, Calendar, Building } from "lucide-react"
 import Link from "next/link"
+import { toast } from "sonner"
 
 const accountTypeNames = {
   savings: "Savings Account",
@@ -97,7 +98,10 @@ export default function PersonalInfoPage() {
     if (validateForm()) {
       // Store form data in localStorage for next step
       localStorage.setItem("accountFormData", JSON.stringify({ ...formData, accountType }))
+      toast.success("Personal information saved successfully!")
       router.push(`/open-account/documents?type=${accountType}`)
+    } else {
+      toast.error("Please fill in all required fields")
     }
   }
 

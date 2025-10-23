@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { ArrowLeft, ArrowRight, FileText, Shield, AlertTriangle, CheckCircle } from "lucide-react"
 import Link from "next/link"
+import { toast } from "sonner"
 
 const accountTypeNames = {
   savings: "Savings Account",
@@ -62,7 +63,10 @@ export default function TermsPage() {
       }
 
       localStorage.setItem("completeAccountData", JSON.stringify(completeData))
+      toast.success("Terms and conditions accepted!")
       router.push(`/open-account/confirmation?type=${accountType}`)
+    } else {
+      toast.error("Please accept all terms and conditions")
     }
   }
 

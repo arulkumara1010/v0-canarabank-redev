@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { Suspense } from "react"
 import { AuthProvider } from "@/components/auth-provider"
+import { Toaster } from "sonner"
 import "./globals.css"
 
 const inter = Inter({
@@ -27,6 +28,7 @@ export default function RootLayout({
       <body className={`font-sans ${inter.variable} antialiased`}>
         <AuthProvider>
           <Suspense fallback={null}>{children}</Suspense>
+          <Toaster position="top-right" />
         </AuthProvider>
       </body>
     </html>

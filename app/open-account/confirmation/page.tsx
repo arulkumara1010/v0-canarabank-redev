@@ -18,8 +18,10 @@ import {
   User,
   FileText,
   Smartphone,
+  LogIn,
 } from "lucide-react"
 import Link from "next/link"
+import { toast } from "sonner"
 
 const accountTypeNames = {
   savings: "Savings Account",
@@ -36,6 +38,13 @@ export default function ConfirmationPage() {
   const [applicationData, setApplicationData] = useState<any>(null)
   const [applicationNumber, setApplicationNumber] = useState("")
 
+  // Function to clear application data
+  const clearApplicationData = () => {
+    localStorage.removeItem("accountFormData")
+    localStorage.removeItem("accountDocuments")
+    localStorage.removeItem("completeAccountData")
+  }
+
   useEffect(() => {
     // Load complete application data
     const savedData = localStorage.getItem("completeAccountData")
@@ -47,10 +56,18 @@ export default function ConfirmationPage() {
       const appNumber = `CAN${Date.now().toString().slice(-8)}`
       setApplicationNumber(appNumber)
 
-      // Clear stored data as application is complete
-      localStorage.removeItem("accountFormData")
-      localStorage.removeItem("accountDocuments")
-      localStorage.removeItem("completeAccountData")
+      // Show success notification after a short delay to ensure page is rendered
+      setTimeout(() => {
+        toast.success("Account application submitted successfully!")
+      }, 500)
+
+      // Clear data after 30 seconds to give user time to see the page
+      const clearTimer = setTimeout(() => {
+        clearApplicationData()
+      }, 30000)
+
+      // Cleanup timer on unmount
+      return () => clearTimeout(clearTimer)
     } else {
       // Redirect if no data found
       router.push("/open-account")
@@ -102,6 +119,14 @@ export default function ConfirmationPage() {
               Your {accountTypeNames[accountType as keyof typeof accountTypeNames]} application has been received and is
               being processed.
             </p>
+            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-sm text-green-700">
+                <strong>Application Number:</strong> {applicationNumber}
+              </p>
+              <p className="text-xs text-green-600 mt-1">
+                Please save this number for future reference. You can return to this page anytime.
+              </p>
+            </div>
           </div>
 
           {/* Application Summary */}
@@ -288,10 +313,14 @@ export default function ConfirmationPage() {
               Download Receipt
             </Button>
 
-            <Link href="/dashboard">
-              <Button size="lg">
-                <CreditCard className="h-4 w-4 mr-2" />
-                Go to Dashboard
+            <Link href="/login">
+              <Button 
+                size="lg" 
+                className="bg-primary hover:bg-primary/90"
+                onClick={clearApplicationData}
+              >
+                <LogIn className="h-4 w-4 mr-2" />
+                Login to Your Account
               </Button>
             </Link>
 
@@ -302,6 +331,53 @@ export default function ConfirmationPage() {
               </Button>
             </Link>
           </div>
+
+          {/* Next Steps */}
+          <Card className="mt-8">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <CheckCircle className="h-5 w-5 mr-2 text-green-600" />
+                What's Next?
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-start space-x-3">
+                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-blue-600 text-sm font-semibold">1</span>
+                  </div>
+                  <div>
+                    <h4 className="font-medium">Account Verification</h4>
+                    <p className="text-sm text-muted-foreground">
+                      We'll verify your documents and information within 2-3 business days.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-blue-600 text-sm font-semibold">2</span>
+                  </div>
+                  <div>
+                    <h4 className="font-medium">Account Activation</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Once verified, your account will be activated and you'll receive login credentials via email/SMS.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-blue-600 text-sm font-semibold">3</span>
+                  </div>
+                  <div>
+                    <h4 className="font-medium">Start Banking</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Login to your dashboard to access all banking services, transfer money, and manage your account.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Mobile App Promotion */}
           <Card className="mt-8">

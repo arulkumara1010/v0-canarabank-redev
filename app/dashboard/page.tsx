@@ -18,17 +18,20 @@ import {
   ArrowDownLeft,
   Plus,
   Home,
+  FileText,
 } from "lucide-react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { ProtectedRoute } from "@/components/protected-route"
+import { getRecentTransactions, getLoanApplications, LOAN_STATUSES } from "@/lib/transactions"
 
 function DashboardContent() {
-  const { user, logout } = useAuth()
+  const { user, userData, logout } = useAuth()
   const router = useRouter()
   const [showBalance, setShowBalance] = useState(true)
 
   console.log("[v0] Dashboard user:", user)
+  console.log("[v0] Dashboard userData:", userData)
 
   const handleLogout = () => {
     logout()
@@ -46,14 +49,12 @@ function DashboardContent() {
     }).format(amount)
   }
 
-  const recentTransactions = [
-    { id: 1, type: "credit", amount: 5000, description: "Salary Credit", date: "2024-01-15" },
-    { id: 2, type: "debit", amount: 1200, description: "Online Shopping", date: "2024-01-14" },
-    { id: 3, type: "debit", amount: 500, description: "ATM Withdrawal", date: "2024-01-13" },
-    { id: 4, type: "credit", amount: 2000, description: "Refund", date: "2024-01-12" },
-  ]
+  // Get recent transactions and loan applications
+  const recentTransactions = user ? getRecentTransactions(user.id, 5) : []
+  const loanApplications = user ? getLoanApplications(user.id) : []
+  const pendingLoans = loanApplications.filter(loan => loan.status === 'submitted' || loan.status === 'under_review')
 
-  if (!user) {
+  if (!user || !userData) {
     return <div>Loading user data...</div>
   }
 
@@ -92,7 +93,7 @@ function DashboardContent() {
               </Button>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{showBalance ? formatCurrency(user.balance) : "••••••••"}</div>
+              <div className="text-2xl font-bold">{showBalance ? formatCurrency(userData.user.balance) : "••••••••"}</div>
               <p className="text-xs text-muted-foreground">
                 Account: {user.accountNumber} • {user.accountType.toUpperCase()}
               </p>
@@ -112,6 +113,42 @@ function DashboardContent() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Loan Status */}
+        {pendingLoans.length > 0 && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <FileText className="w-5 h-5 mr-2" />
+                Loan Applications Status
+              </CardTitle>
+              <CardDescription>Track your pending loan applications</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {pendingLoans.map((loan) => (
+                  <div key={loan.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div>
+                      <h4 className="font-medium">{loan.loanType}</h4>
+                      <p className="text-sm text-gray-600">
+                        Amount: {formatCurrency(loan.amount)} • Tenure: {loan.tenure}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Applied: {new Date(loan.applicationDate).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <Badge 
+                      variant={loan.status === 'submitted' ? 'secondary' : 'default'}
+                      className="ml-4"
+                    >
+                      {LOAN_STATUSES[loan.status]}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Quick Actions */}
         <Card className="mb-8">
@@ -141,9 +178,13 @@ function DashboardContent() {
                 <CreditCard className="h-6 w-6" />
                 <span className="text-sm">Card Services</span>
               </Button>
-              <Button className="h-20 flex-col space-y-2 bg-transparent" variant="outline">
-                <Plus className="h-6 w-6" />
-                <span className="text-sm">Add Beneficiary</span>
+              <Button 
+                className="h-20 flex-col space-y-2 bg-transparent" 
+                variant="outline"
+                onClick={() => router.push("/dashboard/loans")}
+              >
+                <FileText className="h-6 w-6" />
+                <span className="text-sm">Loan Status</span>
               </Button>
             </div>
           </CardContent>

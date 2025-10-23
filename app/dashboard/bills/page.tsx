@@ -12,12 +12,16 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, Receipt, Zap, Droplets, Wifi, Phone } from "lucide-react"
 import Link from "next/link"
+import { addTransaction } from "@/lib/transactions"
+import { toast } from "sonner"
 
 export default function BillsPage() {
-  const { user } = useAuth()
+  const { user, userData } = useAuth()
   const router = useRouter()
   const [billType, setBillType] = useState("")
   const [amount, setAmount] = useState("")
+  const [consumerNumber, setConsumerNumber] = useState("")
+  const [isProcessing, setIsProcessing] = useState(false)
 
   useEffect(() => {
     if (!user) {
@@ -25,7 +29,7 @@ export default function BillsPage() {
     }
   }, [user, router])
 
-  if (!user) return <div>Loading...</div>
+  if (!user || !userData) return <div>Loading...</div>
 
   const billCategories = [
     { id: "electricity", name: "Electricity", icon: Zap, color: "text-yellow-600" },
@@ -34,9 +38,56 @@ export default function BillsPage() {
     { id: "mobile", name: "Mobile", icon: Phone, color: "text-purple-600" },
   ]
 
-  const handlePayBill = (e: React.FormEvent) => {
+  const handlePayBill = async (e: React.FormEvent) => {
     e.preventDefault()
-    alert(`Bill payment of ₹${amount} for ${billType} initiated successfully!`)
+    
+    if (!billType || !amount || !consumerNumber) {
+      toast.error("Please fill in all fields")
+      return
+    }
+
+    const billAmount = parseFloat(amount)
+    if (billAmount <= 0) {
+      toast.error("Amount must be greater than 0")
+      return
+    }
+
+    if (billAmount > userData.user.balance) {
+      toast.error("Insufficient balance")
+      return
+    }
+
+    setIsProcessing(true)
+
+    try {
+      // Add transaction to user data
+      const transaction = await addTransaction(user.id, {
+        type: 'debit',
+        amount: billAmount,
+        description: `${billCategories.find(b => b.id === billType)?.name} Bill Payment`,
+        category: 'bill',
+        reference: `BILL-${billType.toUpperCase()}-${consumerNumber}`,
+        status: 'completed'
+      })
+
+      toast.success(`Bill payment of ₹${billAmount.toLocaleString()} for ${billCategories.find(b => b.id === billType)?.name} completed successfully!`)
+      
+      // Reset form
+      setAmount("")
+      setBillType("")
+      setConsumerNumber("")
+      
+      // Redirect to dashboard after a short delay
+      setTimeout(() => {
+        router.push("/dashboard")
+      }, 2000)
+
+    } catch (error) {
+      toast.error("Bill payment failed. Please try again.")
+      console.error("Bill payment error:", error)
+    } finally {
+      setIsProcessing(false)
+    }
   }
 
   return (
@@ -97,7 +148,13 @@ export default function BillsPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="consumer-number">Consumer Number</Label>
-                <Input id="consumer-number" placeholder="Enter consumer number" required />
+                <Input 
+                  id="consumer-number" 
+                  placeholder="Enter consumer number" 
+                  value={consumerNumber}
+                  onChange={(e) => setConsumerNumber(e.target.value)}
+                  required 
+                />
               </div>
 
               <div className="space-y-2">
@@ -112,8 +169,12 @@ export default function BillsPage() {
                 />
               </div>
 
-              <Button type="submit" className="w-full" disabled={!amount || !billType}>
-                Pay Bill
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={!amount || !billType || !consumerNumber || isProcessing}
+              >
+                {isProcessing ? "Processing..." : "Pay Bill"}
               </Button>
             </form>
           </CardContent>

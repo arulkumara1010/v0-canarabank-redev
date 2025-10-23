@@ -12,13 +12,16 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, Send } from "lucide-react"
 import Link from "next/link"
+import { addTransaction } from "@/lib/transactions"
+import { toast } from "sonner"
 
 export default function TransferPage() {
-  const { user } = useAuth()
+  const { user, userData } = useAuth()
   const router = useRouter()
   const [amount, setAmount] = useState("")
   const [beneficiary, setBeneficiary] = useState("")
   const [transferType, setTransferType] = useState("")
+  const [isProcessing, setIsProcessing] = useState(false)
 
   useEffect(() => {
     if (!user) {
@@ -26,12 +29,58 @@ export default function TransferPage() {
     }
   }, [user, router])
 
-  if (!user) return <div>Loading...</div>
+  if (!user || !userData) return <div>Loading...</div>
 
-  const handleTransfer = (e: React.FormEvent) => {
+  const handleTransfer = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Simulate transfer
-    alert(`Transfer of ₹${amount} to ${beneficiary} initiated successfully!`)
+    
+    if (!amount || !beneficiary || !transferType) {
+      toast.error("Please fill in all fields")
+      return
+    }
+
+    const transferAmount = parseFloat(amount)
+    if (transferAmount <= 0) {
+      toast.error("Amount must be greater than 0")
+      return
+    }
+
+    if (transferAmount > userData.user.balance) {
+      toast.error("Insufficient balance")
+      return
+    }
+
+    setIsProcessing(true)
+
+    try {
+      // Add transaction to user data
+      const transaction = await addTransaction(user.id, {
+        type: 'debit',
+        amount: transferAmount,
+        description: `Transfer to ${beneficiary}`,
+        category: 'transfer',
+        reference: `${transferType.toUpperCase()}-${Date.now()}`,
+        status: 'completed'
+      })
+
+      toast.success(`Transfer of ₹${transferAmount.toLocaleString()} to ${beneficiary} completed successfully!`)
+      
+      // Reset form
+      setAmount("")
+      setBeneficiary("")
+      setTransferType("")
+      
+      // Redirect to dashboard after a short delay
+      setTimeout(() => {
+        router.push("/dashboard")
+      }, 2000)
+
+    } catch (error) {
+      toast.error("Transfer failed. Please try again.")
+      console.error("Transfer error:", error)
+    } finally {
+      setIsProcessing(false)
+    }
   }
 
   return (
@@ -106,8 +155,12 @@ export default function TransferPage() {
                 <Input id="remarks" placeholder="Enter transfer remarks" />
               </div>
 
-              <Button type="submit" className="w-full" disabled={!amount || !beneficiary || !transferType}>
-                Transfer Money
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={!amount || !beneficiary || !transferType || isProcessing}
+              >
+                {isProcessing ? "Processing..." : "Transfer Money"}
               </Button>
             </form>
           </CardContent>

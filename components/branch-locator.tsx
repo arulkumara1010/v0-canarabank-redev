@@ -21,6 +21,14 @@ export function BranchLocator() {
     }
   }
 
+  const handleATMSearch = () => {
+    if (searchQuery.trim()) {
+      router.push(`/services/atm?search=${encodeURIComponent(searchQuery)}`)
+    } else {
+      router.push("/services/atm")
+    }
+  }
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       handleSearch()
@@ -31,19 +39,19 @@ export function BranchLocator() {
     <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-heading font-bold text-balance mb-4">Find Us Near You</h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto text-pretty">
-            Locate our branches and ATMs across the country
+          <h2 className="text-3xl font-heading font-bold mb-4">Find Branches & ATMs</h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Locate the nearest Canara Bank branch or ATM with detailed information and directions
           </p>
         </div>
 
-        <div className="max-w-md mx-auto">
-          <Card className="p-6">
-            <CardHeader className="text-center pb-6">
-              <div className="flex items-center justify-center space-x-2 mb-2">
-                <MapPin className="h-6 w-6 text-primary" />
-                <CardTitle className="text-xl">Branch & ATM Locator</CardTitle>
-              </div>
+        <div className="max-w-2xl mx-auto">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-center">
+                <MapPin className="w-5 h-5 mr-2 text-primary" />
+                Branch & ATM Locator
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
@@ -68,6 +76,24 @@ export function BranchLocator() {
                   </Button>
                 </div>
               </div>
+              
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleSearch}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Find Branches
+                </Button>
+                <Button
+                  onClick={handleATMSearch}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Find ATMs
+                </Button>
+              </div>
+              
               <p className="text-xs text-muted-foreground text-center text-pretty">
                 Find the nearest branch or ATM with directions and contact details
               </p>
