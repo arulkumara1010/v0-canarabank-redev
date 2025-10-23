@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ArrowLeft, ArrowRight, Upload, FileText, CheckCircle, AlertCircle, Camera, ImageIcon } from "lucide-react"
 import Link from "next/link"
+import { useToast } from "@/hooks/use-toast"
 
 const accountTypeNames = {
   savings: "Savings Account",
@@ -63,6 +64,7 @@ interface UploadedFile {
 export default function DocumentsPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const { toast } = useToast()
   const accountType = searchParams.get("type") || "savings"
 
   const [uploadedFiles, setUploadedFiles] = useState<Record<string, UploadedFile>>({})
@@ -81,7 +83,11 @@ export default function DocumentsPage() {
   const handleFileUpload = (documentId: string, file: File) => {
     if (file.size > 5 * 1024 * 1024) {
       // 5MB limit
-      alert("File size should be less than 5MB")
+      toast({
+        title: "File too large",
+        description: "File size should be less than 5MB",
+        variant: "destructive",
+      })
       return
     }
 
@@ -104,6 +110,10 @@ export default function DocumentsPage() {
           status: "success",
         },
       }))
+      toast({
+        title: "Upload successful",
+        description: `${file.name} has been uploaded successfully`,
+      })
     }, 2000)
   }
 
@@ -216,7 +226,10 @@ export default function DocumentsPage() {
                           <div className="flex gap-2 justify-center">
                             <Button
                               variant="outline"
-                              onClick={() => document.getElementById(`upload-${document.id}`)?.click()}
+                              onClick={() => {
+                                const input = document.getElementById(`upload-${document.id}`) as HTMLInputElement
+                                input?.click()
+                              }}
                             >
                               <ImageIcon className="h-4 w-4 mr-2" />
                               Choose File
@@ -224,8 +237,8 @@ export default function DocumentsPage() {
                             <Button
                               variant="outline"
                               onClick={() => {
-                                // In a real app, this would open camera
-                                document.getElementById(`upload-${document.id}`)?.click()
+                                const input = document.getElementById(`upload-${document.id}`) as HTMLInputElement
+                                input?.click()
                               }}
                             >
                               <Camera className="h-4 w-4 mr-2" />
@@ -280,7 +293,10 @@ export default function DocumentsPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => document.getElementById(`reupload-${document.id}`)?.click()}
+                          onClick={() => {
+                            const input = document.getElementById(`reupload-${document.id}`) as HTMLInputElement
+                            input?.click()
+                          }}
                         >
                           Upload Different File
                         </Button>

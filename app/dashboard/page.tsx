@@ -17,6 +17,7 @@ import {
   ArrowUpRight,
   ArrowDownLeft,
   Plus,
+  Home,
 } from "lucide-react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -31,6 +32,10 @@ function DashboardContent() {
 
   const handleLogout = () => {
     logout()
+    router.push("/")
+  }
+
+  const handleGoHome = () => {
     router.push("/")
   }
 
@@ -63,6 +68,10 @@ function DashboardContent() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600">Welcome, {user.name}</span>
+              <Button variant="outline" size="sm" onClick={handleGoHome}>
+                <Home className="w-4 h-4 mr-2" />
+                Home
+              </Button>
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
